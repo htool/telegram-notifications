@@ -1,0 +1,17 @@
+{
+  "name": "telegram-notifications",
+  "version": "1.0.1",
+  "description": "simple package to send telegram notifications when an event is triggered",
+  "main": "index.js",
+  "keywords": [
+    "signalk-node-server-plugin"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Hans Tool <hans@defect.org>",
+  "license": "MIT",
+  "dependencies": {
+    "node-telegram-bot-api": "^0.51.0"
+  }
+}
