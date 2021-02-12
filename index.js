@@ -41,6 +41,18 @@ module.exports = function(app) {
           bot.sendMessage(chatId, prefix + elementToString(element.stateOfCharge, 'stateOfCharge') + ', ' + elementToString(element.voltage));
         });
       } else
+      if (text == 'Tank') {
+        Object.values(app.getSelfPath('tanks.freshWater')).forEach(element => {
+          app.debug('Tank: ' + JSON.stringify(element));
+          var prefix = elementName(element) + 'tank ';
+          bot.sendMessage(chatId, prefix + elementToString(element.currentLevel));
+        });
+        Object.values(app.getSelfPath('tanks.fuel')).forEach(element => {
+          app.debug('Tank: ' + JSON.stringify(element));
+          var prefix = elementName(element) + 'tank ';
+          bot.sendMessage(chatId, prefix + elementToString(element.currentLevel));
+        });
+      } else
       if (text == 'Solar') {
         for (const [name, element] of Object.entries(app.getSelfPath('electrical.solar'))) {
         //Object.values(app.getSelfPath('electrical.solar')).forEach(element => {
@@ -48,7 +60,7 @@ module.exports = function(app) {
           bot.sendMessage(chatId, name + ': ' + elementToString(element.current) + ', power: ' + element.panelPower.value + ' Watt, charging mode: ' + element.chargingMode.value);
         }
       } else {
-        bot.sendMessage(chatId, 'Use this chatId in SignalK: ' + chatId + '\nTemp - Inside temperature\nBatt - battery states\nSolar - Solar state');
+        bot.sendMessage(chatId, 'Use this chatId in SignalK: ' + chatId + '\nTemp - Inside temperature\nTank - Tank information\nBatt - battery states\nSolar - Solar state');
       }
 
       //type other code here
@@ -79,6 +91,9 @@ module.exports = function(app) {
     }
     if (type == 'stateOfCharge') {
       return ('charge level: ' + (value * 100) + '%');
+    }
+    if (units == 'ratio') {
+      return (': ' + (value * 100) + '%');
     }
     if (units == 'V') {
       return ('voltage: ' + value.toFixed(1) + 'v');
