@@ -29,12 +29,18 @@ module.exports = function(app) {
       app.debug('Options: ' + JSON.stringify(options));
 
       if (text == 'Temp') {
-        bot.sendMessage(chatId, 'Kajuit temperature: ' + (app.getSelfPath('environment.inside.temperature').value - 273.15).toFixed(1));
+        bot.sendMessage(chatId, PathToString('environment.inside.temperature'));
       } else
-      if (text == 'Accu') {
-        bot.sendMessage(chatId, 'Service accu: ' + (app.getSelfPath('electrical.batteries.1.stateOfCharge').value * 100).toFixed(1));
+      if (text == 'Batt') {
+        bot.sendMessage(chatId, PathToString('electrical.batteries.1.stateOfCharge'));
+        bot.sendMessage(chatId, PathToString('electrical.batteries.1.voltage'));
+      } else
+      if (text == 'Solar') {
+        bot.sendMessage(chatId, PathToString('electrical.solar.SmartSolar.panelPower'));
+        bot.sendMessage(chatId, PathToString('electrical.solar.SmartSolar.current'));
+        bot.sendMessage(chatId, PathToString('electrical.solar.SmartSolar.chargingMode'));
       } else {
-        bot.sendMessage(chatId, 'Use this chatId in SignalK: ' + chatId + '\nTemp - Kajuit temperature\nAccu - battery state');
+        bot.sendMessage(chatId, 'Use this chatId in SignalK: ' + chatId + '\nTemp - Kajuit temperature\nBatt - battery state');
       }
 
       //type other code here
@@ -45,6 +51,48 @@ module.exports = function(app) {
 
 
   };
+
+  function RemoveLastPath(path)
+  {
+      var the_arr = path.split('.');
+      the_arr.pop();
+      return(the_arr.join('.'));
+  }
+
+  function PathToString (path) {
+    pathObject = app.getSelfPath(path);
+    app.debug('pathObject: ' + pathObject);
+    var unit = pathObject.unit;
+    var value = pathObject.value;
+    var returnValue;
+    var name = app.getSelfPath(RemoveLastPath(path) + '.name').value;
+    app.debug('name: ' + name);
+    if (typeof name == 'string') {
+      returnValue = name + ' ';
+    };
+
+
+    if (unit == 'Kelvin') {
+      returnValue = 'temperature: ' + (value - 273.15).toFixed(1) + '°C';
+    }
+    if (path.endsWith('stateOfCharge')) {
+      returnValue = 'change level: ' + (value * 100) + '%';
+    }
+    if (unit == 'V') {
+      returnValue = 'voltage: ' + value + 'v';
+    }
+    if (unit == 'A') {
+      returnValue = 'current: ' + value + 'A';
+    }
+    if (path.endsWith('panelPower')) {
+      returnValue = 'power: ' + value + ' Watt';
+    }
+    if (path.endsWith('chargingMode')) {
+      returnValue = 'charging mode: ' + value;
+    }
+
+    return returnValue;
+  }
 
   function listen(option) {
     let _notify = function(event) {
