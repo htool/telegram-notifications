@@ -102,7 +102,7 @@ module.exports = function(app) {
       return ('current: ' + value + 'A');
     }
     if (units == 'm3') {
-      return ('liter: ', (value  * 1000).toFixed(0));
+      return ('liter: ' + (value  * 1000).toFixed(0));
     }
     if (type == 'watt') {
       return ('power: ' + value + ' Watt');
