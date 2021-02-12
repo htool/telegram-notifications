@@ -75,27 +75,26 @@ module.exports = function(app) {
     var units = object.meta.units;
     var value = object.value;
     app.debug('units: ' + units + ' value: ' + value);
-    var returnValue;
 
     if (units == 'K') {
-      returnValue += 'temperature: ' + (value - 273.15).toFixed(1) + '°C';
+      return('temperature: ' + (value - 273.15).toFixed(1) + '°C');
     }
     if (type == 'stateOfCharge') {
-      returnValue += 'charge level: ' + (value * 100) + '%';
+      return ('charge level: ' + (value * 100) + '%');
     }
     if (units == 'V') {
-      returnValue += 'voltage: ' + value + 'v';
+      return ('voltage: ' + value + 'v');
     }
     if (units == 'A') {
-      returnValue += 'current: ' + value + 'A';
+      return ('current: ' + value + 'A');
     }
     if (type == 'watt') {
-      returnValue += 'power: ' + value + ' Watt';
+      return ('power: ' + value + ' Watt');
     }
     if (type == 'chargingMode') {
-      returnValue += 'charging mode: ' + value;
+      return ('charging mode: ' + value);
     }
-    return returnValue;
+    return ('');
   }
 
   function listen(option) {
