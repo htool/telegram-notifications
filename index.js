@@ -45,9 +45,7 @@ module.exports = function(app) {
         Object.values(app.getSelfPath('electrical.solar')).forEach(element => {
           app.debug('Value: ' + JSON.stringify(element));
           var prefix = elementName(element) + 'Solar ';
-          bot.sendMessage(chatId, prefix + elementToString(element.current.value));
-          bot.sendMessage(chatId, prefix + 'power: ' + element.panelPower.value);
-          bot.sendMessage(chatId, prefix + 'charging mode: ' + element.chargingMode.value);
+          bot.sendMessage(chatId, prefix + elementToString(element.current) + ', 'power: ' + element.panelPower.value + ' Watt, charging mode: ' + element.chargingMode.value);
         });
       } else {
         bot.sendMessage(chatId, 'Use this chatId in SignalK: ' + chatId + '\nTemp - Inside temperature\nBatt - battery states\nSolar - Solar state');
