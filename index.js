@@ -38,7 +38,7 @@ module.exports = function(app) {
         Object.values(app.getSelfPath('electrical.batteries')).forEach(element => {
           app.debug('Value: ' + JSON.stringify(element));
           var prefix = elementName(element) + 'battery ';
-          bot.sendMessage(chatId, prefix + elementToString(element.stateOfCharge, 'stateOfCharge' + ' ' + elementToString(element.voltage));
+          bot.sendMessage(chatId, prefix + elementToString(element.stateOfCharge, 'stateOfCharge') + ', ' + elementToString(element.voltage));
         });
       } else
       if (text == 'Solar') {
