@@ -30,23 +30,23 @@ module.exports = function(app) {
 
       if (text == 'Temp') {
         var element = app.getSelfPath('environment.inside.temperature');
-        app.debug('Value: ' + JSON.stringify(element));
+        app.debug('Temp: ' + JSON.stringify(element));
         var prefix = 'Inside ';
         bot.sendMessage(chatId, prefix + elementToString(element));
       } else
       if (text == 'Batt') {
         Object.values(app.getSelfPath('electrical.batteries')).forEach(element => {
-          app.debug('Value: ' + JSON.stringify(element));
+          app.debug('Batt: ' + JSON.stringify(element));
           var prefix = elementName(element) + 'battery ';
           bot.sendMessage(chatId, prefix + elementToString(element.stateOfCharge, 'stateOfCharge') + ', ' + elementToString(element.voltage));
         });
       } else
       if (text == 'Solar') {
-        Object.values(app.getSelfPath('electrical.solar')).forEach(element => {
-          app.debug('Value: ' + JSON.stringify(element));
-          var prefix = elementName(element) + 'Solar ';
-          bot.sendMessage(chatId, prefix + elementToString(element.current) + ', power: ' + element.panelPower.value + ' Watt, charging mode: ' + element.chargingMode.value);
-        });
+        for (const [name, element] of Object.entries(app.getSelfPath('electrical.solar'))) {
+        //Object.values(app.getSelfPath('electrical.solar')).forEach(element => {
+          app.debug('Solar: ' + JSON.stringify(element));
+          bot.sendMessage(chatId, name + ': ' + elementToString(element.current) + ', power: ' + element.panelPower.value + ' Watt, charging mode: ' + element.chargingMode.value);
+        }
       } else {
         bot.sendMessage(chatId, 'Use this chatId in SignalK: ' + chatId + '\nTemp - Inside temperature\nBatt - battery states\nSolar - Solar state');
       }
