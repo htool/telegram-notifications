@@ -46,7 +46,7 @@ module.exports = function(app) {
         Object.values(app.getSelfPath('electrical.solar')).forEach(element => {
           app.debug('Value: ' + element);
           var prefix = elementName(element) + 'Solar ';
-          bot.sendMessage(chatId, prefix + elementToString(element.current));
+          bot.sendMessage(chatId, prefix + elementToString(element.current.value));
           bot.sendMessage(chatId, prefix + 'power: ' + element.panelPower.value);
           bot.sendMessage(chatId, prefix + 'charging mode: ' + element.chargingMode.value);
         });
@@ -62,7 +62,7 @@ module.exports = function(app) {
   };
 
   function elementName (element) {
-    let name = element.name;
+    let name = element.name.value;
     if (typeof name == 'string') {
     app.debug('name: ' + name);
       return (name + ' ');
@@ -88,10 +88,10 @@ module.exports = function(app) {
       returnValue += 'temperature: ' + (value - 273.15).toFixed(1) + '°C';
     }
     if (type == 'stateOfCharge') {
-      returnValue += 'battery charge level: ' + (value * 100) + '%';
+      returnValue += 'charge level: ' + (value * 100) + '%';
     }
     if (unit == 'V') {
-      returnValue += 'battery voltage: ' + value + 'v';
+      returnValue += 'voltage: ' + value + 'v';
     }
     if (unit == 'A') {
       returnValue += 'current: ' + value + 'A';
