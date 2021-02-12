@@ -28,41 +28,44 @@ module.exports = function(app) {
       app.debug('Message: ' + JSON.stringify(msg));
       app.debug('Options: ' + JSON.stringify(options));
 
+      var reply = '';
+
       if (text == 'Temp') {
         var element = app.getSelfPath('environment.inside.temperature');
         app.debug('Temp: ' + JSON.stringify(element));
         var prefix = 'Inside ';
-        bot.sendMessage(chatId, prefix + elementToString(element));
+        reply += prefix + elementToString(element) + '\n';
       } else
       if (text == 'Batt') {
         Object.values(app.getSelfPath('electrical.batteries')).forEach(element => {
           app.debug('Batt: ' + JSON.stringify(element));
           var prefix = elementName(element) + 'battery ';
-          bot.sendMessage(chatId, prefix + elementToString(element.stateOfCharge, 'stateOfCharge') + ', ' + elementToString(element.voltage));
+          reply += prefix + elementToString(element.stateOfCharge, 'stateOfCharge') + ', ' + elementToString(element.voltage) + '\n';
         });
       } else
       if (text == 'Tank') {
         Object.values(app.getSelfPath('tanks.freshWater')).forEach(element => {
           app.debug('Tank: ' + JSON.stringify(element));
           var prefix = elementName(element) + '(' + element.type.value + ') tank ';
-          bot.sendMessage(chatId, prefix + elementToString(element.currentLevel) + ', ' + elementToString(element.currentVolume));
+          reply += prefix + elementToString(element.currentLevel) + ', ' + elementToString(element.currentVolume) + '\n';
         });
         Object.values(app.getSelfPath('tanks.fuel')).forEach(element => {
           app.debug('Tank: ' + JSON.stringify(element));
           var prefix = elementName(element) + '(' + element.type.value + ') tank ';
-          bot.sendMessage(chatId, prefix + elementToString(element.currentLevel) + ', ' + elementToString(element.currentVolume));
+          reply += prefix + elementToString(element.currentLevel) + ', ' + elementToString(element.currentVolume) + '\n';
         });
       } else
       if (text == 'Solar') {
         for (const [name, element] of Object.entries(app.getSelfPath('electrical.solar'))) {
         //Object.values(app.getSelfPath('electrical.solar')).forEach(element => {
           app.debug('Solar: ' + JSON.stringify(element));
-          bot.sendMessage(chatId, name + ': ' + elementToString(element.current) + ', power: ' + element.panelPower.value + ' Watt, charging mode: ' + element.chargingMode.value);
+          reply += name + ': ' + elementToString(element.current) + ', power: ' + element.panelPower.value + ' Watt, charging mode: ' + element.chargingMode.value + '\n';
         }
       } else {
-        bot.sendMessage(chatId, 'Use this chatId in SignalK: ' + chatId + '\nTemp - Inside temperature\nTank - Tank information\nBatt - battery states\nSolar - Solar state');
+        reply += 'Use this chatId in SignalK: ' + chatId + '\nTemp - Inside temperature\nTank - Tank information\nBatt - battery states\nSolar - Solar state' + '\n';
       }
 
+      bot.sendMessage(chatId, reply);
       //type other code here
     });
     app.setPluginStatus('Running');
