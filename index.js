@@ -33,7 +33,7 @@ module.exports = function(app) {
       } else
       if (text == 'Batt') {
         Object.values(app.getSelfPath('electrical.batteries')).forEach(element => {
-          app.debug('Value: ' + element);
+          app.debug('Value: ' + JSON.stringify(element));
           var prefix = pathName(element) + 'battery ';
           bot.sendMessage(chatId, prefix + PathToString(element + '.stateOfCharge'));
           bot.sendMessage(chatId, prefix + PathToString(element + '.voltage'));
@@ -53,8 +53,6 @@ module.exports = function(app) {
 
       //type other code here
     });
-
-
     app.setPluginStatus('Running');
 
 
