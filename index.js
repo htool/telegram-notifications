@@ -38,8 +38,7 @@ module.exports = function(app) {
         Object.values(app.getSelfPath('electrical.batteries')).forEach(element => {
           app.debug('Value: ' + JSON.stringify(element));
           var prefix = elementName(element) + 'battery ';
-          bot.sendMessage(chatId, prefix + elementToString(element.stateOfCharge, 'stateOfCharge'));
-          bot.sendMessage(chatId, prefix + elementToString(element.voltage));
+          bot.sendMessage(chatId, prefix + elementToString(element.stateOfCharge, 'stateOfCharge' + ' ' + elementToString(element.voltage));
         });
       } else
       if (text == 'Solar') {
@@ -71,16 +70,9 @@ module.exports = function(app) {
     };
   }
 
-  function RemoveLastPath(path)
-  {
-      var the_arr = path.split('.');
-      the_arr.pop();
-      return(the_arr.join('.'));
-  }
-
   function elementToString (object, type) {
     app.debug('type: ' + type + ' object: ' + JSON.stringify(object));
-    var units = object.units;
+    var units = object.meta.units;
     var value = object.value;
     app.debug('units: ' + units + ' value: ' + value);
     var returnValue;
