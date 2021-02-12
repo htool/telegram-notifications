@@ -82,9 +82,10 @@ module.exports = function(app) {
     app.debug('type: ' + type + ' object: ' + JSON.stringify(object));
     var units = object.units;
     var value = object.value;
+    app.debug('units: ' + units + ' value: ' + value);
     var returnValue;
 
-    if (units == 'Kelvin') {
+    if (units == 'K') {
       returnValue += 'temperature: ' + (value - 273.15).toFixed(1) + '°C';
     }
     if (type == 'stateOfCharge') {
@@ -102,7 +103,6 @@ module.exports = function(app) {
     if (type == 'chargingMode') {
       returnValue += 'charging mode: ' + value;
     }
-
     return returnValue;
   }
 
