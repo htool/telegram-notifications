@@ -44,12 +44,12 @@ module.exports = function(app) {
       if (text == 'Tank') {
         Object.values(app.getSelfPath('tanks.freshWater')).forEach(element => {
           app.debug('Tank: ' + JSON.stringify(element));
-          var prefix = elementName(element) + 'water tank ';
+          var prefix = elementName(element) + '(' + element.type.value + ') tank ';
           bot.sendMessage(chatId, prefix + elementToString(element.currentLevel) + ', ' + elementToString(element.currentVolume));
         });
         Object.values(app.getSelfPath('tanks.fuel')).forEach(element => {
           app.debug('Tank: ' + JSON.stringify(element));
-          var prefix = elementName(element) + 'tank ';
+          var prefix = elementName(element) + '(' + element.type.value + ') tank ';
           bot.sendMessage(chatId, prefix + elementToString(element.currentLevel) + ', ' + elementToString(element.currentVolume));
         });
       } else
