@@ -44,13 +44,13 @@ module.exports = function(app) {
       if (text == 'Tank') {
         Object.values(app.getSelfPath('tanks.freshWater')).forEach(element => {
           app.debug('Tank: ' + JSON.stringify(element));
-          var prefix = elementName(element) + 'tank ';
-          bot.sendMessage(chatId, prefix + elementToString(element.currentLevel));
+          var prefix = elementName(element) + 'water tank ';
+          bot.sendMessage(chatId, prefix + elementToString(element.currentLevel) + ', ' + elementToString(element.currentVolume));
         });
         Object.values(app.getSelfPath('tanks.fuel')).forEach(element => {
           app.debug('Tank: ' + JSON.stringify(element));
           var prefix = elementName(element) + 'tank ';
-          bot.sendMessage(chatId, prefix + elementToString(element.currentLevel));
+          bot.sendMessage(chatId, prefix + elementToString(element.currentLevel) + ', ' + elementToString(element.currentVolume));
         });
       } else
       if (text == 'Solar') {
@@ -100,6 +100,9 @@ module.exports = function(app) {
     }
     if (units == 'A') {
       return ('current: ' + value + 'A');
+    }
+    if (units == 'm3') {
+      return ('liter: ', (value  * 1000).toFixed(0));
     }
     if (type == 'watt') {
       return ('power: ' + value + ' Watt');
