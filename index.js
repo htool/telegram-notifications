@@ -32,13 +32,21 @@ module.exports = function(app) {
         bot.sendMessage(chatId, PathToString('environment.inside.temperature'));
       } else
       if (text == 'Batt') {
-        bot.sendMessage(chatId, PathToString('electrical.batteries.1.stateOfCharge'));
-        bot.sendMessage(chatId, PathToString('electrical.batteries.1.voltage'));
+        Object.values(app.getSelfPath('electrical.batteries')).forEach(element => {
+          app.debug('Value: ' + element);
+          var prefix = pathName(element) + 'battery ';
+          bot.sendMessage(chatId, prefix + PathToString(element + '.stateOfCharge'));
+          bot.sendMessage(chatId, prefix + PathToString(element + '.voltage'));
+        });
       } else
       if (text == 'Solar') {
-        bot.sendMessage(chatId, PathToString('electrical.solar.SmartSolar.panelPower'));
-        bot.sendMessage(chatId, PathToString('electrical.solar.SmartSolar.current'));
-        bot.sendMessage(chatId, PathToString('electrical.solar.SmartSolar.chargingMode'));
+        Object.values(app.getSelfPath('electrical.solar')).forEach(element => {
+          app.debug('Value: ' + element);
+          var prefix = pathName(element) + ' ';
+          bot.sendMessage(chatId, prefix + PathToString(element + '.panelPower'));
+          bot.sendMessage(chatId, prefix + PathToString(element + '.current'));
+          bot.sendMessage(chatId, prefix + PathToString(element + '.chargingMode'));
+        });
       } else {
         bot.sendMessage(chatId, 'Use this chatId in SignalK: ' + chatId + '\nTemp - Kajuit temperature\nBatt - battery state');
       }
@@ -51,6 +59,16 @@ module.exports = function(app) {
 
 
   };
+
+  function pathName (path) {
+    var name = app.getSelfPath(path + '.name').value;
+    if (typeof name == 'string') {
+    app.debug('name: ' + name);
+      return (name + ' ');
+    } else {
+      return ('');
+    };
+  }
 
   function RemoveLastPath(path)
   {
@@ -65,21 +83,16 @@ module.exports = function(app) {
     var unit = pathObject.unit;
     var value = pathObject.value;
     var returnValue;
-    var name = app.getSelfPath(RemoveLastPath(path) + '.name').value;
-    app.debug('name: ' + name);
-    if (typeof name == 'string') {
-      returnValue = name + ' ';
-    };
 
 
     if (unit == 'Kelvin') {
       returnValue += 'temperature: ' + (value - 273.15).toFixed(1) + '°C';
     }
     if (path.endsWith('stateOfCharge')) {
-      returnValue += 'charge level: ' + (value * 100) + '%';
+      returnValue += 'battery charge level: ' + (value * 100) + '%';
     }
     if (unit == 'V') {
-      returnValue += 'voltage: ' + value + 'v';
+      returnValue += 'battery voltage: ' + value + 'v';
     }
     if (unit == 'A') {
       returnValue += 'current: ' + value + 'A';
