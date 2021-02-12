@@ -73,22 +73,22 @@ module.exports = function(app) {
 
 
     if (unit == 'Kelvin') {
-      returnValue = 'temperature: ' + (value - 273.15).toFixed(1) + '°C';
+      returnValue += 'temperature: ' + (value - 273.15).toFixed(1) + '°C';
     }
     if (path.endsWith('stateOfCharge')) {
-      returnValue = 'change level: ' + (value * 100) + '%';
+      returnValue += 'charge level: ' + (value * 100) + '%';
     }
     if (unit == 'V') {
-      returnValue = 'voltage: ' + value + 'v';
+      returnValue += 'voltage: ' + value + 'v';
     }
     if (unit == 'A') {
-      returnValue = 'current: ' + value + 'A';
+      returnValue += 'current: ' + value + 'A';
     }
     if (path.endsWith('panelPower')) {
-      returnValue = 'power: ' + value + ' Watt';
+      returnValue += 'power: ' + value + ' Watt';
     }
     if (path.endsWith('chargingMode')) {
-      returnValue = 'charging mode: ' + value;
+      returnValue += 'charging mode: ' + value;
     }
 
     return returnValue;
