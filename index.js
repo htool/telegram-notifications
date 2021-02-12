@@ -60,7 +60,7 @@ module.exports = function(app) {
   };
 
   function elementName (element) {
-    if (typeof element.name == 'string') {
+    if (typeof element.name != 'undefined') {
       let name = element.name.value;
       app.debug('name: ' + name);
       return (name + ' ');
