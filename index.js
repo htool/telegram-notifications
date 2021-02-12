@@ -18,7 +18,6 @@ module.exports = function(app) {
     // Create a bot that uses 'polling' to fetch new updates
     const bot = new TelegramBot(token, {polling: true});
 
-    //bot.logOut();
     app.debug('Options: ' + JSON.stringify(options));
 
     options.notifications.forEach(option => listen(option));
@@ -128,6 +127,8 @@ module.exports = function(app) {
 
   plugin.stop = function() {
     // Here we put logic we need when the plugin stops
+    let token = options.bot.token;
+    const bot = new TelegramBot(token);
     bot.close();
     app.debug('Plugin stopped');
     unsubscribes.forEach(f => f());
