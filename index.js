@@ -18,6 +18,7 @@ module.exports = function(app) {
     // Create a bot that uses 'polling' to fetch new updates
     const bot = new TelegramBot(token, {polling: true});
 
+    //bot.logOut();
     app.debug('Options: ' + JSON.stringify(options));
 
     options.notifications.forEach(option => listen(option));
@@ -29,26 +30,29 @@ module.exports = function(app) {
       app.debug('Options: ' + JSON.stringify(options));
 
       if (text == 'Temp') {
-        bot.sendMessage(chatId, PathToString('environment.inside.temperature'));
+        var element = app.getSelfPath('environment.inside.temperature');
+        app.debug('Value: ' + JSON.stringify(element));
+        var prefix = 'Inside temperature ';
+        bot.sendMessage(chatId, prefix + elementToString(element));
       } else
       if (text == 'Batt') {
         Object.values(app.getSelfPath('electrical.batteries')).forEach(element => {
           app.debug('Value: ' + JSON.stringify(element));
-          var prefix = pathName(element) + 'battery ';
-          bot.sendMessage(chatId, prefix + PathToString(element + '.stateOfCharge'));
-          bot.sendMessage(chatId, prefix + PathToString(element + '.voltage'));
+          var prefix = elementName(element) + 'battery ';
+          bot.sendMessage(chatId, prefix + elementToString(element.stateOfCharge, 'stateOfCharge'));
+          bot.sendMessage(chatId, prefix + elementToString(element.voltage));
         });
       } else
       if (text == 'Solar') {
         Object.values(app.getSelfPath('electrical.solar')).forEach(element => {
           app.debug('Value: ' + element);
-          var prefix = pathName(element) + ' ';
-          bot.sendMessage(chatId, prefix + PathToString(element + '.panelPower'));
-          bot.sendMessage(chatId, prefix + PathToString(element + '.current'));
-          bot.sendMessage(chatId, prefix + PathToString(element + '.chargingMode'));
+          var prefix = elementName(element) + 'Solar ';
+          bot.sendMessage(chatId, prefix + elementToString(element.current));
+          bot.sendMessage(chatId, prefix + 'power: ' + element.panelPower.value);
+          bot.sendMessage(chatId, prefix + 'charging mode: ' + element.chargingMode.value);
         });
       } else {
-        bot.sendMessage(chatId, 'Use this chatId in SignalK: ' + chatId + '\nTemp - Kajuit temperature\nBatt - battery state');
+        bot.sendMessage(chatId, 'Use this chatId in SignalK: ' + chatId + '\nTemp - Inside temperature\nBatt - battery states\nSolar - Solar state');
       }
 
       //type other code here
@@ -58,8 +62,8 @@ module.exports = function(app) {
 
   };
 
-  function pathName (path) {
-    var name = app.getSelfPath(path + '.name').value;
+  function elementName (element) {
+    let name = element.name;
     if (typeof name == 'string') {
     app.debug('name: ' + name);
       return (name + ' ');
@@ -75,18 +79,16 @@ module.exports = function(app) {
       return(the_arr.join('.'));
   }
 
-  function PathToString (path) {
-    pathObject = app.getSelfPath(path);
-    app.debug('pathObject: ' + pathObject);
-    var unit = pathObject.unit;
-    var value = pathObject.value;
+  function elementToString (object, type) {
+    app.debug('type: ' + type + ' object: ' + JSON.stringify(object));
+    var unit = object.unit;
+    var value = object.value;
     var returnValue;
-
 
     if (unit == 'Kelvin') {
       returnValue += 'temperature: ' + (value - 273.15).toFixed(1) + '°C';
     }
-    if (path.endsWith('stateOfCharge')) {
+    if (type == 'stateOfCharge') {
       returnValue += 'battery charge level: ' + (value * 100) + '%';
     }
     if (unit == 'V') {
@@ -95,10 +97,10 @@ module.exports = function(app) {
     if (unit == 'A') {
       returnValue += 'current: ' + value + 'A';
     }
-    if (path.endsWith('panelPower')) {
+    if (type == 'watt') {
       returnValue += 'power: ' + value + ' Watt';
     }
-    if (path.endsWith('chargingMode')) {
+    if (type == 'chargingMode') {
       returnValue += 'charging mode: ' + value;
     }
 
@@ -126,6 +128,7 @@ module.exports = function(app) {
 
   plugin.stop = function() {
     // Here we put logic we need when the plugin stops
+    bot.close();
     app.debug('Plugin stopped');
     unsubscribes.forEach(f => f());
     app.setPluginStatus('Stopped');
