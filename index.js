@@ -80,20 +80,20 @@ module.exports = function(app) {
 
   function elementToString (object, type) {
     app.debug('type: ' + type + ' object: ' + JSON.stringify(object));
-    var unit = object.unit;
+    var units = object.units;
     var value = object.value;
     var returnValue;
 
-    if (unit == 'Kelvin') {
+    if (units == 'Kelvin') {
       returnValue += 'temperature: ' + (value - 273.15).toFixed(1) + '°C';
     }
     if (type == 'stateOfCharge') {
       returnValue += 'charge level: ' + (value * 100) + '%';
     }
-    if (unit == 'V') {
+    if (units == 'V') {
       returnValue += 'voltage: ' + value + 'v';
     }
-    if (unit == 'A') {
+    if (units == 'A') {
       returnValue += 'current: ' + value + 'A';
     }
     if (type == 'watt') {
