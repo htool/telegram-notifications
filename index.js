@@ -31,7 +31,7 @@ module.exports = function(app) {
       if (text == 'Temp') {
         var element = app.getSelfPath('environment.inside.temperature');
         app.debug('Value: ' + JSON.stringify(element));
-        var prefix = 'Inside temperature ';
+        var prefix = 'Inside ';
         bot.sendMessage(chatId, prefix + elementToString(element));
       } else
       if (text == 'Batt') {
@@ -43,7 +43,7 @@ module.exports = function(app) {
       } else
       if (text == 'Solar') {
         Object.values(app.getSelfPath('electrical.solar')).forEach(element => {
-          app.debug('Value: ' + element);
+          app.debug('Value: ' + JSON.stringify(element));
           var prefix = elementName(element) + 'Solar ';
           bot.sendMessage(chatId, prefix + elementToString(element.current.value));
           bot.sendMessage(chatId, prefix + 'power: ' + element.panelPower.value);
@@ -83,7 +83,7 @@ module.exports = function(app) {
       return ('charge level: ' + (value * 100) + '%');
     }
     if (units == 'V') {
-      return ('voltage: ' + value + 'v');
+      return ('voltage: ' + value.toFixed(1) + 'v');
     }
     if (units == 'A') {
       return ('current: ' + value + 'A');
