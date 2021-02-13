@@ -121,7 +121,7 @@ module.exports = function(app) {
       app.debug(event);
         // app.debug(option.recipients + ' ' + option.message)
         // bot.sendMessage(option., option.message);
-      });
+
     };
 
     app.on(option.event, _notify);
