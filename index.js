@@ -119,9 +119,9 @@ module.exports = function(app) {
   function listen(option) {
     let _notify = function(event) {
       app.debug(event);
-        // app.debug(option.recipients + ' ' + option.message)
+      app.debug(option);
+      app.debug(option.recipients + ' ' + option.message)
         // bot.sendMessage(option., option.message);
-
     };
 
     app.on(option.event, _notify);
