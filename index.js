@@ -2,6 +2,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const PLUGIN_ID = 'telegram-notifications';
 const PLUGIN_NAME = 'Telegram notifications';
 var unsubscribes = [];
+var bot;
 
 module.exports = function(app) {
   var plugin = {};
@@ -16,7 +17,7 @@ module.exports = function(app) {
 
     let token = options.bot.token;
     // Create a bot that uses 'polling' to fetch new updates
-    const bot = new TelegramBot(token, {polling: true});
+    bot = new TelegramBot(token, {polling: true});
 
     app.debug('Options: ' + JSON.stringify(options));
 
@@ -118,8 +119,8 @@ module.exports = function(app) {
 
   function listen(option) {
     let _notify = function(event) {
-      app.debug(option.recipients + ' ' + option.message)
-      //bot.sendMessage(option.recipients, option.message);
+    app.debug(option.recipients + ' ' + option.message)
+    bot.sendMessage(option.recipients, '[NOTIFICATION] ' + option.message);
     };
 
     app.on(option.event, _notify);
@@ -135,10 +136,7 @@ module.exports = function(app) {
 
   plugin.stop = function() {
     // Here we put logic we need when the plugin stops
-    // let token = options.bot.token;
-    // const bot = new TelegramBot(token);
-    // bot.stopPolling();
-    // bot.close();
+    bot.close();
     app.debug('Plugin stopped');
     unsubscribes.forEach(f => f());
     app.setPluginStatus('Stopped');
