@@ -175,7 +175,7 @@ module.exports = function(app) {
               title: 'message'
             },
             recipients: {
-              type: 'string',
+              type: 'number',
               title: 'Chat id'
             }
           }
