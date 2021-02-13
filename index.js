@@ -118,9 +118,9 @@ module.exports = function(app) {
 
   function listen(option) {
     let _notify = function(event) {
-      option.recipients.forEach(recipient => {
-        bot.sendMessage(chatId, option.message);
-        app.debug(chatId + ' ' + option.message)
+      app.debug(event);
+        // app.debug(option.recipients + ' ' + option.message)
+        // bot.sendMessage(option., option.message);
       });
     };
 
