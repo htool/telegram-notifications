@@ -119,7 +119,7 @@ module.exports = function(app) {
   function listen(option) {
     let _notify = function(event) {
       app.debug(option.recipients + ' ' + option.message)
-      bot.sendMessage(option.recipients, option.message);
+      //bot.sendMessage(option.recipients, option.message);
     };
 
     app.on(option.event, _notify);
