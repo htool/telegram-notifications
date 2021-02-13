@@ -34,10 +34,10 @@ module.exports = function(app) {
       if (text == 'Temp') {
         var element = app.getSelfPath('environment.inside.temperature');
         app.debug('Temp: ' + JSON.stringify(element));
-        reply += 'Inside ' + elementToString(element)';
+        reply += 'Inside ' + elementToString(element);
         element = app.getSelfPath('environment.water.temperature');
         app.debug('Temp: ' + JSON.stringify(element));
-        reply += ', water ' + elementToString(element)';
+        reply += ', water ' + elementToString(element);
       } else
       if (text == 'Batt') {
         Object.values(app.getSelfPath('electrical.batteries')).forEach(element => {
