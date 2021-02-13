@@ -99,7 +99,7 @@ module.exports = function(app) {
       return ('charge level: ' + (value * 100) + '%');
     }
     if (units == 'ratio') {
-      return (': ' + (value * 100) + '%');
+      return (': ' + (value * 100).toFixed(1) + '%');
     }
     if (units == 'V') {
       return ('voltage: ' + value.toFixed(1) + 'v');
