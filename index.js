@@ -14,21 +14,38 @@ module.exports = function(app) {
   plugin.start = function(options, restartPlugin) {
     app.debug('Plugin started');
     plugin.options = options;
-
     let token = options.bot.token;
     // Create a bot that uses 'polling' to fetch new updates
     bot = new TelegramBot(token, {polling: true});
-
     app.debug('Options: ' + JSON.stringify(options));
-
     options.notifications.forEach(option => listen(option));
+
+    let localSubscription = {
+      context: 'vessels.self', // Get data for all contexts
+      subscribe: [{
+        path: 'notifications.buddy.*', // Get all paths
+        policy: 'instant',
+      }]
+    };
+
+    app.subscriptionmanager.subscribe(
+      localSubscription,
+      unsubscribes,
+      subscriptionError => {
+        app.error('Error:' + subscriptionError);
+      },
+      delta => {
+        delta.updates.forEach(u => {
+          app.debug(u);
+        });
+      }
+    );
 
     bot.on('message', (msg) => {
       let chatId = msg.chat.id;
       let text = msg.text;
       app.debug('Message: ' + JSON.stringify(msg));
       app.debug('Options: ' + JSON.stringify(options));
-
       var reply = '';
 
       if (text == 'Temp') {
@@ -72,9 +89,9 @@ module.exports = function(app) {
       //type other code here
     });
     app.setPluginStatus('Running');
-
-
   };
+
+
 
   function elementName (element) {
     if (typeof element.name != 'undefined') {
