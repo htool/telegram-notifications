@@ -36,7 +36,7 @@ module.exports = function(app) {
       },
       delta => {
         delta.updates.forEach(u => {
-          app.debug(u);
+          app.debug(u.values.value);
         });
       }
     );
