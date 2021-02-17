@@ -92,23 +92,29 @@ module.exports = function(app) {
         reply += ', water ' + elementToString(element);
       } else
       if (text == 'Buddy') {
-        for (const [path, element] of Object.entries(app.getSelfPath('notifications.buddy'))) {
-          app.debug('buddy: ' + path + ': ' + JSON.stringify(element));
-          var buddy = app.getPath('vessels.' + path.replace(/^notifications.buddy./, ''));
-          if (typeof buddy != 'undefined' && buddy.buddy == true) {
-            const myPos = app.getSelfPath('navigation.position.value');
-            var position = buddy.navigation.position.value;
-            reply += buddy.name.capitalize();
-            if (typeof buddy.navigation.destination != 'undefined') {
-              harbour = buddy.navigation.destination.commonName.value.name.capitalize();
-              reply += ' (' + harbour + ')';
+        const buddies = app.getSelfPath('notifications.buddy');
+
+        if (typeof buddies != 'undefined') {
+          for (const [path, element] of Object.entries(app.getSelfPath('notifications.buddy'))) {
+            app.debug('buddy: ' + path + ': ' + JSON.stringify(element));
+            var buddy = app.getPath('vessels.' + path.replace(/^notifications.buddy./, ''));
+            if (typeof buddy != 'undefined' && buddy.buddy == true) {
+              const myPos = app.getSelfPath('navigation.position.value');
+              var position = buddy.navigation.position.value;
+              reply += buddy.name.capitalize();
+              if (typeof buddy.navigation.destination != 'undefined') {
+                harbour = buddy.navigation.destination.commonName.value.name.capitalize();
+                reply += ' (' + harbour + ')';
+              }
+              reply += ' is near';
+              if ( myPos && myPos.latitude && myPos.longitude ) {
+                  const distance = geolib.getDistance(myPos, position);
+                  reply += ' (' + distance + 'm)';
+              }
+              reply += '\n';
             }
-            reply += ' is near';
-            if ( myPos && myPos.latitude && myPos.longitude ) {
-                const distance = geolib.getDistance(myPos, position);
-                reply += ' (' + distance + 'm)';
-            }
-            reply += '\n';
+          } else {
+            reply += 'No buddies nearby\n';
           }
         };
       } else
