@@ -113,10 +113,10 @@ module.exports = function(app) {
               }
               reply += '\n';
             }
-          } else {
-            reply += 'No buddies nearby\n';
           }
-        };
+        } else {
+          reply += 'No buddies nearby\n';
+        }
       } else
       if (text == 'Batt') {
         Object.values(app.getSelfPath('electrical.batteries')).forEach(element => {
