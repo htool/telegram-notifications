@@ -3,6 +3,7 @@ const PLUGIN_ID = 'telegram-notifications';
 const PLUGIN_NAME = 'Telegram notifications';
 var unsubscribes = [];
 var bot;
+var globalChatId;
 
 module.exports = function(app) {
   var plugin = {};
@@ -36,13 +37,15 @@ module.exports = function(app) {
       },
       delta => {
         delta.updates.forEach(u => {
-          app.debug(u.values.value);
+          app.debug(u.values.message);
+          bot.sendMessage(globalChatId, u.values.message);
         });
       }
     );
 
     bot.on('message', (msg) => {
       let chatId = msg.chat.id;
+      globalChatId = chatId;
       let text = msg.text;
       app.debug('Message: ' + JSON.stringify(msg));
       app.debug('Options: ' + JSON.stringify(options));
