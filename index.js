@@ -60,7 +60,7 @@ module.exports = function(app) {
         Object.values(app.getSelfPath('notifications.buddy')).forEach(element => {
           app.debug('Buddy: ' + JSON.stringify(element.value.message));
           // var prefix = elementName(element) + 'battery ';
-          reply += elementToString(element.value.message);
+          reply += element.value.message;
         });
       } else
       if (text == 'Batt') {
