@@ -58,9 +58,9 @@ module.exports = function(app) {
       } else
       if (text == 'Buddy') {
         Object.values(app.getSelfPath('notifications.buddy')).forEach(element => {
-          app.debug('Buddy: ' + JSON.stringify(element));
+          app.debug('Buddy: ' + JSON.stringify(element.value.message));
           // var prefix = elementName(element) + 'battery ';
-          reply += elementToString(element.name) + ' nearby ' + elementToString(element.distance) + '\n';
+          reply += elementToString(element.value.message);
         });
       } else
       if (text == 'Batt') {
@@ -89,7 +89,12 @@ module.exports = function(app) {
           reply += name + ': ' + elementToString(element.current) + ', power: ' + element.panelPower.value + ' Watt, charging mode: ' + element.chargingMode.value + '\n';
         }
       } else {
-        reply += 'Use this chatId in SignalK: ' + chatId + '\nTemp - Inside temperature\nTank - Tank information\nBatt - battery states\nSolar - Solar state' + '\n';
+        reply += 'Use this chatId in SignalK: ' + chatId + '\n \
+        Temp - Inside temperature\n \
+        Tank - Tank information\n \
+        Batt - battery states\n \
+        Solar - Solar state\n \
+        Buddy - Nearby buddies';
       }
 
       bot.sendMessage(chatId, reply);
