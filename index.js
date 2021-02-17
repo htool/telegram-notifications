@@ -1,9 +1,10 @@
 const TelegramBot = require('node-telegram-bot-api');
+const geolib = require('geolib');
 const PLUGIN_ID = 'telegram-notifications';
 const PLUGIN_NAME = 'Telegram notifications';
 var unsubscribes = [];
 var bot;
-var globalChatId;
+var chatids;
 
 module.exports = function(app) {
   var plugin = {};
@@ -12,13 +13,18 @@ module.exports = function(app) {
   plugin.name = PLUGIN_NAME;
   plugin.description = 'A plugin to send telegram notifications when an event occurs';
 
+  String.prototype.capitalize = function() {
+      return this.charAt(0).toUpperCase() + this.slice(1).toLowerCase();
+  }
+
   plugin.start = function(options, restartPlugin) {
-    app.debug('Plugin started');
     plugin.options = options;
+    chatids = options.chatids;
+    app.debug('Plugin started. Using chatids: ' + chatids.join(','));
     let token = options.bot.token;
     // Create a bot that uses 'polling' to fetch new updates
     bot = new TelegramBot(token, {polling: true});
-    app.debug('Options: ' + JSON.stringify(options));
+    // app.debug('Options: ' + JSON.stringify(options));
     options.notifications.forEach(option => listen(option));
 
     let localSubscription = {
@@ -37,9 +43,34 @@ module.exports = function(app) {
       },
       delta => {
         delta.updates.forEach(u => {
-          app.debug(u);
-          app.debug(u.values.value);
-          bot.sendMessage(globalChatId, u.values.value);
+          var vessel = 'vessels.' + u['values'][0]['path'].replace(/^notifications.buddy./, '');
+          var buddy = app.getPath(vessel);
+          var message = '';
+          if (typeof buddy != 'undefined') {
+            if (typeof buddy.name != 'undefined') {
+              name = buddy.name.capitalize();
+              app.debug('Name: ' + name);
+              message += name;
+              if (typeof buddy.navigation.destination != 'undefined') {
+                harbour = buddy.navigation.destination.commonName.value.name.capitalize();
+                message += ' (' + harbour + ')';
+              }
+              message += ' is near';
+            }
+            if (typeof buddy.navigation.position != 'undefined') {
+              const myPos = app.getSelfPath('navigation.position.value');
+              app.debug('myPos: ' + JSON.stringify(myPos));
+              var position = buddy.navigation.position.value;
+              app.debug('position: ' + JSON.stringify(position));
+              if ( myPos && myPos.latitude && myPos.longitude ) {
+                  const distance = geolib.getDistance(myPos, position);
+                  message += ' (' + distance + 'm)';
+              }
+            }
+            sendMessage(message);
+          } else {
+            app.debug('Unknown vessel')
+          }
         });
       }
     );
@@ -61,11 +92,25 @@ module.exports = function(app) {
         reply += ', water ' + elementToString(element);
       } else
       if (text == 'Buddy') {
-        Object.values(app.getSelfPath('notifications.buddy')).forEach(element => {
-          app.debug('Buddy: ' + JSON.stringify(element.value.message));
-          // var prefix = elementName(element) + 'battery ';
-          reply += element.value.message;
-        });
+        for (const [path, element] of Object.entries(app.getSelfPath('notifications.buddy'))) {
+          app.debug('buddy: ' + path + ': ' + JSON.stringify(element));
+          var buddy = app.getPath('vessels.' + path.replace(/^notifications.buddy./, ''));
+          if (typeof buddy != 'undefined' && buddy.buddy == true) {
+            const myPos = app.getSelfPath('navigation.position.value');
+            var position = buddy.navigation.position.value;
+            reply += buddy.name.capitalize();
+            if (typeof buddy.navigation.destination != 'undefined') {
+              harbour = buddy.navigation.destination.commonName.value.name.capitalize();
+              reply += ' (' + harbour + ')';
+            }
+            reply += ' is near';
+            if ( myPos && myPos.latitude && myPos.longitude ) {
+                const distance = geolib.getDistance(myPos, position);
+                reply += ' (' + distance + 'm)';
+            }
+            reply += '\n';
+          }
+        };
       } else
       if (text == 'Batt') {
         Object.values(app.getSelfPath('electrical.batteries')).forEach(element => {
@@ -101,7 +146,7 @@ module.exports = function(app) {
         Buddy - Nearby buddies';
       }
 
-      bot.sendMessage(chatId, reply);
+      sendMessage(reply);
       //type other code here
     });
     app.setPluginStatus('Running');
@@ -154,8 +199,7 @@ module.exports = function(app) {
 
   function listen(option) {
     let _notify = function(event) {
-    app.debug(option.recipients + ' ' + option.message)
-    bot.sendMessage(option.recipients, '[NOTIFICATION] ' + option.message);
+    sendMessage('[NOTIFICATION] ' + option.message);
     };
 
     app.on(option.event, _notify);
@@ -167,6 +211,13 @@ module.exports = function(app) {
   function addElement (ElementList, element) {
       let newList = Object.assign(ElementList, element)
       return newList
+  }
+
+  function sendMessage (message) {
+    chatids.forEach(chatid => {
+      app.debug('Sending ' + chatid + ': ' + message);
+      bot.sendMessage(chatid, message);
+    });
   }
 
   plugin.stop = function() {
@@ -189,6 +240,15 @@ module.exports = function(app) {
             type: 'string',
             title: 'Telegram Bot Token'
           }
+        },
+      },
+      chatids: {
+        type: 'array',
+        title: 'Chat ids to receive messages',
+        required: ['chatids'],
+        items: {
+          type: 'number',
+          title: 'Chat id'
         }
       },
       notifications: {
@@ -204,10 +264,6 @@ module.exports = function(app) {
             message: {
               type: 'string',
               title: 'message'
-            },
-            recipients: {
-              type: 'number',
-              title: 'Chat id'
             }
           }
         }

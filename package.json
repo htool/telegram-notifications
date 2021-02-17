@@ -12,6 +12,7 @@
   "author": "Hans Tool <hans@defect.org>",
   "license": "MIT",
   "dependencies": {
+    "geolib": "^3.3.1",
     "node-telegram-bot-api": "^0.51.0"
   }
 }
