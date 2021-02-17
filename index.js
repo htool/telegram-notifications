@@ -56,6 +56,13 @@ module.exports = function(app) {
         app.debug('Temp: ' + JSON.stringify(element));
         reply += ', water ' + elementToString(element);
       } else
+      if (text == 'Buddy') {
+        Object.values(app.getSelfPath('notifications.buddy')).forEach(element => {
+          app.debug('Buddy: ' + JSON.stringify(element));
+          // var prefix = elementName(element) + 'battery ';
+          reply += elementToString(element.name) + ' nearby ' + elementToString(element.distance) + '\n';
+        });
+      } else
       if (text == 'Batt') {
         Object.values(app.getSelfPath('electrical.batteries')).forEach(element => {
           app.debug('Batt: ' + JSON.stringify(element));
