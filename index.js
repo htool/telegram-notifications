@@ -96,12 +96,13 @@ module.exports = function(app) {
 
         if (typeof buddies != 'undefined') {
           for (const [path, element] of Object.entries(app.getSelfPath('notifications.buddy'))) {
-            app.debug('buddy: ' + path + ': ' + JSON.stringify(element));
             var buddy = app.getPath('vessels.' + path);
             app.debug('buddy: ' + JSON.stringify(buddy));
             if (typeof buddy != 'undefined' && buddy.buddy == true) {
               const myPos = app.getSelfPath('navigation.position.value');
+              app.debug('myPos: ' + JSON.stringify(myPos));
               var position = buddy.navigation.position.value;
+              app.debug('position: ' + JSON.stringify(position));              
               reply += buddy.name.capitalize();
               if (typeof buddy.navigation.destination != 'undefined') {
                 harbour = buddy.navigation.destination.commonName.value.name.capitalize();
