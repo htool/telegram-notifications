@@ -38,8 +38,8 @@ module.exports = function(app) {
       delta => {
         delta.updates.forEach(u => {
           app.debug(u);
-          app.debug(u.value.message);
-          bot.sendMessage(globalChatId, u.value.message);
+          app.debug(u.values.value);
+          bot.sendMessage(globalChatId, u.values.value);
         });
       }
     );
