@@ -70,9 +70,8 @@ module.exports = function(app) {
         if (typeof buddies != 'undefined') {
           Object.values(buddies).forEach(buddy => {
             app.debug('buddy: ' + JSON.stringify(buddy));
-            app.debug('value: ' + JSON.stringify(buddy['value']));
             app.debug('value: ' + JSON.stringify(buddy.value));
-            reply += buddy['value'].replace(/Your buddy /, '');
+            reply += buddy.value.message.replace(/Your buddy /, '');
             reply += '\n';
             app.debug('reply: ' + reply);
           });
