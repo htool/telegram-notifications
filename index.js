@@ -107,6 +107,7 @@ module.exports = function(app) {
                 }
                 reply += ' is near';
               }
+              app.debug('before myPos')
               const myPos = app.getSelfPath('navigation.position.value');
               app.debug('myPos: ' + JSON.stringify(myPos));
               if (typeof buddy.navigation.position != 'undefined') {
