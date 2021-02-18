@@ -102,21 +102,24 @@ module.exports = function(app) {
               const myPos = app.getSelfPath('navigation.position.value');
               app.debug('myPos: ' + JSON.stringify(myPos));
               var position = buddy.navigation.position.value;
-              app.debug('position: ' + JSON.stringify(position));              
-              reply += buddy.name.capitalize();
-              if (typeof buddy.navigation.destination != 'undefined') {
-                harbour = buddy.navigation.destination.commonName.value.name.capitalize();
-                reply += ' (' + harbour + ')';
-              }
-              reply += ' is near';
-              if ( myPos && myPos.latitude && myPos.longitude ) {
+              app.debug('position: ' + JSON.stringify(position));
+              if (typeof buddy.name != 'undefined') {
+                reply += buddy.name.capitalize();
+                if (typeof buddy.navigation.destination != 'undefined') {
+                  harbour = buddy.navigation.destination.commonName.value.name.capitalize();
+                  reply += ' (' + harbour + ')';
+                }
+                reply += ' is near';
+                if ( myPos && myPos.latitude && myPos.longitude ) {
                   const distance = geolib.getDistance(myPos, position);
                   reply += ' (' + distance + 'm)';
+                }
+                reply += '\n';
               }
-              reply += '\n';
             }
           }
-        } else {
+        }
+        if (reply == '') {
           reply += 'No buddies nearby\n';
         }
       } else
