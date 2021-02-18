@@ -51,7 +51,7 @@ module.exports = function(app) {
               name = buddy.name.capitalize();
               app.debug('Name: ' + name);
               message += name;
-              if (typeof buddy.navigation.destination != 'undefined') {
+              if (typeof buddy.navigation.destination.commonName != 'undefined') {
                 harbour = buddy.navigation.destination.commonName.value.name.capitalize();
                 message += ' (' + harbour + ')';
               }
@@ -99,6 +99,7 @@ module.exports = function(app) {
             var buddy = app.getPath('vessels.' + path);
             app.debug('buddy: ' + JSON.stringify(buddy));
             if (typeof buddy != 'undefined' && buddy.buddy == true) {
+              app.debug('buddy is true');
               if (typeof buddy.name != 'undefined') {
                 reply += buddy.name.capitalize();
                 if (typeof buddy.navigation.destination != 'undefined') {
@@ -107,7 +108,7 @@ module.exports = function(app) {
                 }
                 reply += ' is near';
               }
-              app.debug('before myPos')
+              app.debug('before myPos');
               const myPos = app.getSelfPath('navigation.position.value');
               app.debug('myPos: ' + JSON.stringify(myPos));
               if (typeof buddy.navigation.position != 'undefined') {
