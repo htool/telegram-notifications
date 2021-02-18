@@ -99,10 +99,6 @@ module.exports = function(app) {
             var buddy = app.getPath('vessels.' + path);
             app.debug('buddy: ' + JSON.stringify(buddy));
             if (typeof buddy != 'undefined' && buddy.buddy == true) {
-              const myPos = app.getSelfPath('navigation.position.value');
-              app.debug('myPos: ' + JSON.stringify(myPos));
-              var position = buddy.navigation.position.value;
-              app.debug('position: ' + JSON.stringify(position));
               if (typeof buddy.name != 'undefined') {
                 reply += buddy.name.capitalize();
                 if (typeof buddy.navigation.destination != 'undefined') {
@@ -110,6 +106,12 @@ module.exports = function(app) {
                   reply += ' (' + harbour + ')';
                 }
                 reply += ' is near';
+              }
+              const myPos = app.getSelfPath('navigation.position.value');
+              app.debug('myPos: ' + JSON.stringify(myPos));
+              if (typeof buddy.navigation.position != 'undefined') {
+                var position = buddy.navigation.position.value;
+                app.debug('position: ' + JSON.stringify(position));
                 if ( myPos && myPos.latitude && myPos.longitude ) {
                   const distance = geolib.getDistance(myPos, position);
                   reply += ' (' + distance + 'm)';
