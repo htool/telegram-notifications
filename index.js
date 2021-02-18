@@ -70,8 +70,8 @@ module.exports = function(app) {
         if (typeof buddies != 'undefined') {
           Object.values(buddies).forEach(buddy => {
             app.debug('buddy: ' + JSON.stringify(buddy));
-            app.debug('message: ' + JSON.stringify(buddy.message));
-            reply += buddy.message.replace(/Your buddy /, '');
+            app.debug('message: ' + JSON.stringify(buddy.value.message));
+            reply += buddy.value.message.replace(/Your buddy /, '');
             app.debug('reply: ' + reply;
           });
         } else {
