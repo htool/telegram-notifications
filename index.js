@@ -93,37 +93,12 @@ module.exports = function(app) {
       } else
       if (text == 'Buddy') {
         const buddies = app.getSelfPath('notifications.buddy');
-
         if (typeof buddies != 'undefined') {
-          for (const [path, element] of Object.entries(app.getSelfPath('notifications.buddy'))) {
-            var buddy = app.getPath('vessels.' + path);
+          Object.values(buddies).forEach(buddy => {
             app.debug('buddy: ' + JSON.stringify(buddy));
-            if (typeof buddy != 'undefined' && buddy.buddy == true) {
-              app.debug('buddy is true');
-              if (typeof buddy.name != 'undefined') {
-                reply += buddy.name.capitalize();
-                if (typeof buddy.navigation.destination != 'undefined') {
-                  harbour = buddy.navigation.destination.commonName.value.name.capitalize();
-                  reply += ' (' + harbour + ')';
-                }
-                reply += ' is near';
-              }
-              app.debug('before myPos');
-              const myPos = app.getSelfPath('navigation.position.value');
-              app.debug('myPos: ' + JSON.stringify(myPos));
-              if (typeof buddy.navigation.position != 'undefined') {
-                var position = buddy.navigation.position.value;
-                app.debug('position: ' + JSON.stringify(position));
-                if ( myPos && myPos.latitude && myPos.longitude ) {
-                  const distance = geolib.getDistance(myPos, position);
-                  reply += ' (' + distance + 'm)';
-                }
-                reply += '\n';
-              }
-            }
-          }
-        }
-        if (reply == '') {
+            reply += buddy.message.replace(/Your buddy /, '');
+          });
+        } else {
           reply += 'No buddies nearby\n';
         }
       } else
