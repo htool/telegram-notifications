@@ -13,10 +13,6 @@ module.exports = function(app) {
   plugin.name = PLUGIN_NAME;
   plugin.description = 'A plugin to send telegram notifications when an event occurs';
 
-  String.prototype.capitalize = function() {
-      return this.charAt(0).toUpperCase() + this.slice(1).toLowerCase();
-  }
-
   plugin.start = function(options, restartPlugin) {
     plugin.options = options;
     chatids = options.chatids;
@@ -43,34 +39,12 @@ module.exports = function(app) {
       },
       delta => {
         delta.updates.forEach(u => {
-          var vessel = 'vessels.' + u['values'][0]['path'].replace(/^notifications.buddy./, '');
-          var buddy = app.getPath(vessel);
-          var message = '';
-          if (typeof buddy != 'undefined') {
-            if (typeof buddy.name != 'undefined') {
-              name = buddy.name.capitalize();
-              app.debug('Name: ' + name);
-              message += name;
-              if (typeof buddy.navigation.destination.commonName != 'undefined') {
-                harbour = buddy.navigation.destination.commonName.value.name.capitalize();
-                message += ' (' + harbour + ')';
-              }
-              message += ' is near';
-            }
-            if (typeof buddy.navigation.position != 'undefined') {
-              const myPos = app.getSelfPath('navigation.position.value');
-              app.debug('myPos: ' + JSON.stringify(myPos));
-              var position = buddy.navigation.position.value;
-              app.debug('position: ' + JSON.stringify(position));
-              if ( myPos && myPos.latitude && myPos.longitude ) {
-                  const distance = geolib.getDistance(myPos, position);
-                  message += ' (' + distance + 'm)';
-              }
-            }
-            sendMessage(message);
-          } else {
-            app.debug('Unknown vessel')
-          }
+          app.debug('u: ' + JSON.stringify(u));
+          var message = u['values'][0]['value']['message'];
+          app.debug('message: ' + message);
+          var message = message.replace(/Your buddy /, '');
+          app.debug('message: ' + message);
+          sendMessage(message);
         });
       }
     );
