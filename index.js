@@ -58,9 +58,15 @@ module.exports = function(app) {
       var reply = '';
 
       if (text == 'Temp') {
-        var element = app.getSelfPath('environment.inside.temperature');
+        var element = app.getSelfPath('environment.outside.temperature');
         app.debug('Temp: ' + JSON.stringify(element));
-        reply += 'Inside ' + elementToString(element);
+        reply += 'Outside ' + elementToString(element);
+        element = app.getSelfPath('environment.inside.temperature');
+        app.debug('Temp: ' + JSON.stringify(element));
+        reply += ', inside  ' + elementToString(element);
+        element = app.getSelfPath('environment.mqtt.fridge.temperature');
+        app.debug('Temp: ' + JSON.stringify(element));
+        reply += ', fridge  ' + elementToString(element);
         element = app.getSelfPath('environment.water.temperature');
         app.debug('Temp: ' + JSON.stringify(element));
         reply += ', water ' + elementToString(element);
