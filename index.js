@@ -149,25 +149,25 @@ module.exports = function(app) {
     app.debug('units: ' + units + ' value: ' + value);
 
     if (units == 'K') {
-      return('temperature: ' + (value - 273.15).toFixed(1) + '°C');
+      return((value - 273.15).toFixed(1) + '°C');
     }
     if (type == 'stateOfCharge') {
-      return ('charge level: ' + (value * 100) + '%');
+      return ((value * 100) + '%');
     }
     if (units == 'ratio') {
-      return (': ' + (value * 100).toFixed(1) + '%');
+      return ((value * 100).toFixed(1) + '%');
     }
     if (units == 'V') {
-      return ('voltage: ' + value.toFixed(1) + 'v');
+      return (value.toFixed(1) + 'v');
     }
     if (units == 'A') {
-      return ('current: ' + value + 'A');
+      return (value + 'A');
     }
     if (units == 'm3') {
       return ('liter: ' + (value  * 1000).toFixed(0));
     }
     if (type == 'watt') {
-      return ('power: ' + value + ' Watt');
+      return (value + ' Watt');
     }
     if (type == 'chargingMode') {
       return ('charging mode: ' + value);
