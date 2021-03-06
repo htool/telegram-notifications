@@ -63,22 +63,22 @@ module.exports = function(app) {
           element = app.getSelfPath('environment.outside.temperature');
           app.debug('Temp: ' + JSON.stringify(element));
           reply += 'Outside ' + elementToString(element);
-        }
+        } catch (e) {}
         try {
           element = app.getSelfPath('environment.inside.temperature');
           app.debug('Temp: ' + JSON.stringify(element));
           reply += ', inside ' + elementToString(element);
-        }
+        } catch (e) {}
         try {
           element = app.getSelfPath('environment.fridge.temperature');
           app.debug('Temp: ' + JSON.stringify(element));
           reply += ', fridge ' + elementToString(element);
-        }
+        } catch (e) {}
         try {
           element = app.getSelfPath('environment.water.temperature');
           app.debug('Temp: ' + JSON.stringify(element));
           reply += ', water ' + elementToString(element);
-        }
+        } catch (e) {}
       } else
       if (text == 'Buddy') {
         const buddies = app.getSelfPath('notifications.buddy');
