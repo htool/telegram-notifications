@@ -64,7 +64,7 @@ module.exports = function(app) {
         element = app.getSelfPath('environment.inside.temperature');
         app.debug('Temp: ' + JSON.stringify(element));
         reply += ', inside  ' + elementToString(element);
-        element = app.getSelfPath('environment.mqtt.fridge.temperature');
+        element = app.getSelfPath('environment.fridge.temperature');
         app.debug('Temp: ' + JSON.stringify(element));
         reply += ', fridge  ' + elementToString(element);
         element = app.getSelfPath('environment.water.temperature');
