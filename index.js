@@ -70,7 +70,7 @@ module.exports = function(app) {
           reply += ', inside ' + elementToString(element);
         } catch (e) {}
         try {
-          element = app.getSelfPath('environment.fridge.temperature');
+          element = app.getSelfPath('environment.inside.fridge.temperature');
           app.debug('Temp: ' + JSON.stringify(element));
           reply += ', fridge ' + elementToString(element);
         } catch (e) {}
