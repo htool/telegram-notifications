@@ -63,10 +63,10 @@ module.exports = function(app) {
         reply += 'Outside ' + elementToString(element);
         element = app.getSelfPath('environment.inside.temperature');
         app.debug('Temp: ' + JSON.stringify(element));
-        reply += ', inside  ' + elementToString(element);
+        reply += ', inside ' + elementToString(element);
         element = app.getSelfPath('environment.fridge.temperature');
         app.debug('Temp: ' + JSON.stringify(element));
-        reply += ', fridge  ' + elementToString(element);
+        reply += ', fridge ' + elementToString(element);
         element = app.getSelfPath('environment.water.temperature');
         app.debug('Temp: ' + JSON.stringify(element));
         reply += ', water ' + elementToString(element);
