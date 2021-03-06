@@ -172,7 +172,7 @@ module.exports = function(app) {
     if (type == 'chargingMode') {
       return ('charging mode: ' + value);
     }
-    return ('');
+    return (value);
   }
 
   function listen(option) {
