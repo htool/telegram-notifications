@@ -119,12 +119,23 @@ module.exports = function(app) {
           app.debug('Solar: ' + JSON.stringify(element));
           reply += name + ': ' + elementToString(element.current) + ', power: ' + element.panelPower.value + ' Watt, charging mode: ' + element.chargingMode.value + '\n';
         }
+      } else
+      if (text == 'Wind') {
+          var windDirection = app.getSelfPath('environment.wind.directionGround')
+          windDirection['meta']['units'] = 'rad'
+          var windSpeed = app.getSelfPath('environment.wind.speedOverGround')
+          reply += 'Wind over ground: ' + elementToString(windDirection) + ', ' + elementToString(windSpeed) + '\n';
+      } else
+      if (text == 'Depth') {
+          reply += 'Depth: ' + elementToString(app.getSelfPath('environment.depth.belowTransducer')) + '\n';
       } else {
         reply += 'Use this chatId in SignalK: ' + chatId + '\n \
         Temp - Inside temperature\n \
         Tank - Tank information\n \
         Batt - battery states\n \
         Solar - Solar state\n \
+        Wind - Wind information\n \
+        Depth - Depth information\n \
         Buddy - Nearby buddies';
       }
 
@@ -152,31 +163,43 @@ module.exports = function(app) {
     var value = object.value;
     app.debug('units: ' + units + ' value: ' + value);
 
-    if (units == 'K') {
-      return((value - 273.15).toFixed(1) + '°C');
-    }
-    if (type == 'stateOfCharge') {
-      return ((value * 100) + '%');
-    }
-    if (units == 'ratio') {
+    switch (units) {
+      case 'K':
+        return((value - 273.15).toFixed(1) + '°C');
+        break
+      case 'rad':
+        return ((value * 57.2958).toFixed(0) + '°T');
+        break
+      case 'm/s':
+        return ((value * 1.94384).toFixed(1) + 'kn');
+          break
+      case 'm':
+        return((value).toFixed(1) + 'm')
+        break
+      case 'stateOfCharge':
+        return ((value * 100) + '%');
+        break
+     case 'ration':
       return ((value * 100).toFixed(1) + '%');
-    }
-    if (units == 'V') {
+      break
+    case 'V':
       return (value.toFixed(1) + 'v');
-    }
-    if (units == 'A') {
+      break
+    case 'A':
       return (value + 'A');
-    }
-    if (units == 'm3') {
+      break
+    case 'm3':
       return ('liter: ' + (value  * 1000).toFixed(0));
-    }
-    if (type == 'watt') {
+      break
+    case 'watt':
       return (value + ' Watt');
-    }
-    if (type == 'chargingMode') {
+      break
+    case 'chargingMode':
       return ('charging mode: ' + value);
+      break
+    default:
+      return (value);
     }
-    return (value);
   }
 
   function listen(option) {
