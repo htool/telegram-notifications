@@ -81,6 +81,34 @@ module.exports = function(app) {
           reply += ', water ' + elementToString(element);
         } catch (e) {}
       } else
+      if (text == 'Humidity') {
+        var element;
+        try {
+          element = app.getSelfPath('environment.outside.humidity');
+          app.debug('Humidity: ' + JSON.stringify(element));
+          reply += 'Outside ' + elementToString(element);
+        } catch (e) {}
+        try {
+          element = app.getSelfPath('environment.inside.fridge.humidity');
+          app.debug('Humidity: ' + JSON.stringify(element));
+          reply += ', fridge ' + elementToString(element);
+        } catch (e) {}
+        try {
+          element = app.getSelfPath('environment.inside.hutvoor.humidity');
+          app.debug('Humidity: ' + JSON.stringify(element));
+          reply += ', hut voor ' + elementToString(element);
+        } catch (e) {}
+        try {
+          element = app.getSelfPath('environment.inside.hutachterbakboord.humidity');
+          app.debug('Humidity: ' + JSON.stringify(element));
+          reply += ', hut bakboord ' + elementToString(element);
+        } catch (e) {}
+        try {
+          element = app.getSelfPath('environment.inside.hutachterstuurboord.humidity');
+          app.debug('Humidity: ' + JSON.stringify(element));
+          reply += ', hut stuurboord ' + elementToString(element);
+        } catch (e) {}
+      } else
       if (text == 'Buddy') {
         const buddies = app.getSelfPath('notifications.buddy');
         if (typeof buddies != 'undefined') {
@@ -136,11 +164,12 @@ module.exports = function(app) {
         Batt - battery states\n \
         Solar - Solar state\n \
         Wind - Wind information\n \
+        Humidity - Humidity information\n \
         Depth - Depth information\n \
         Buddy - Nearby buddies';
       }
 
-      sendMessage(reply);
+      sendMessage(reply, text);
       //type other code here
     });
     app.setPluginStatus('Running');
@@ -161,6 +190,9 @@ module.exports = function(app) {
   function elementToString (object, type) {
     app.debug('type: ' + type + ' object: ' + JSON.stringify(object));
     var units = object.meta.units;
+    if (typeof type != 'undefined') {
+      units = type
+    }
     var value = object.value;
     app.debug('units: ' + units + ' value: ' + value);
 
@@ -180,6 +212,9 @@ module.exports = function(app) {
       case 'stateOfCharge':
         return ((value * 100) + '%');
         break
+     case 'ratio':
+      return ((value * 100).toFixed(1) + '%');
+      break
      case 'ration':
       return ((value * 100).toFixed(1) + '%');
       break
@@ -219,7 +254,11 @@ module.exports = function(app) {
       return newList
   }
 
-  function sendMessage (message) {
+  function sendMessage (message, text) {
+    app.debug('Message: %s text: %s', message, text)
+    if (message  == "") {
+      message = ("No info for " + text)
+    }
     chatids.forEach(chatid => {
       app.debug('Sending ' + chatid + ': ' + message);
       bot.sendMessage(chatid, message);
