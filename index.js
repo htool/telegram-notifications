@@ -53,12 +53,12 @@ module.exports = function(app) {
     bot.on('message', (msg) => {
       let chatId = msg.chat.id;
       globalChatId = chatId;
-      let text = msg.text;
+      let text = msg.text.toLowerCase();
       app.debug('Message: ' + JSON.stringify(msg));
       app.debug('Options: ' + JSON.stringify(options));
       var reply = '';
 
-      if (text == 'Temp') {
+      if (text == 'temp') {
         var element;
         try {
           element = app.getSelfPath('environment.outside.temperature');
@@ -81,7 +81,7 @@ module.exports = function(app) {
           reply += ', water ' + elementToString(element);
         } catch (e) {}
       } else
-      if (text == 'Humidity') {
+      if (text == 'humidity') {
         var element;
         try {
           element = app.getSelfPath('environment.outside.humidity');
@@ -109,7 +109,7 @@ module.exports = function(app) {
           reply += ', hut stuurboord ' + elementToString(element);
         } catch (e) {}
       } else
-      if (text == 'Buddy') {
+      if (text == 'buddy') {
         const buddies = app.getSelfPath('notifications.buddy');
         if (typeof buddies != 'undefined') {
           Object.values(buddies).forEach(buddy => {
@@ -119,7 +119,7 @@ module.exports = function(app) {
           reply += 'No buddies nearby\n';
         }
       } else
-      if (text == 'Batt') {
+      if (text == 'batt') {
         Object.values(app.getSelfPath('electrical.batteries')).forEach(element => {
           app.debug('Batt: ' + JSON.stringify(element));
           var prefix = elementName(element) + 'battery ';
@@ -130,7 +130,7 @@ module.exports = function(app) {
           }
         });
       } else
-      if (text == 'Tank') {
+      if (text == 'tank') {
         Object.values(app.getSelfPath('tanks.freshWater')).forEach(element => {
           app.debug('Tank: ' + JSON.stringify(element));
           var prefix = elementName(element) + '(' + element.type.value + ') tank ';
@@ -142,20 +142,20 @@ module.exports = function(app) {
           reply += prefix + elementToString(element.currentLevel) + ', ' + elementToString(element.currentVolume) + '\n';
         });
       } else
-      if (text == 'Solar') {
+      if (text == 'solar') {
         for (const [name, element] of Object.entries(app.getSelfPath('electrical.solar'))) {
         //Object.values(app.getSelfPath('electrical.solar')).forEach(element => {
           app.debug('Solar: ' + JSON.stringify(element));
           reply += name + ': ' + elementToString(element.current) + ', power: ' + element.panelPower.value + ' Watt, charging mode: ' + element.chargingMode.value + '\n';
         }
       } else
-      if (text == 'Wind') {
+      if (text == 'wind') {
           var windDirection = app.getSelfPath('environment.wind.directionGround')
           windDirection['meta']['units'] = 'rad'
           var windSpeed = app.getSelfPath('environment.wind.speedOverGround')
           reply += 'Wind over ground: ' + elementToString(windDirection) + ', ' + elementToString(windSpeed) + '\n';
       } else
-      if (text == 'Depth') {
+      if (text == 'depth') {
           reply += 'Depth: ' + elementToString(app.getSelfPath('environment.depth.belowTransducer')) + '\n';
       } else {
         reply += 'Use this chatId in SignalK: ' + chatId + '\n \
