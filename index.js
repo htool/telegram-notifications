@@ -7,6 +7,8 @@ var unsubscribes = [];
 var bot;
 var chatids;
 
+var buddiesState = {}
+
 module.exports = function(app) {
   var plugin = {};
 
@@ -41,11 +43,18 @@ module.exports = function(app) {
       delta => {
         delta.updates.forEach(u => {
           app.debug('u: ' + JSON.stringify(u));
+          var path = u['values'][0]['path']
+          app.debug('path: %s', path)
           var message = u['values'][0]['value']['message'];
           app.debug('message: ' + message);
           var message = message.replace(/Your buddy /, '');
           app.debug('message: ' + message);
-          sendMessage(message);
+          if (buddiesState[path] !== message) {
+            sendMessage(message);
+          } else {
+            app.debug('Duplicate message: %s', message)
+          }
+          buddiesState[path] = message
         });
       }
     );
@@ -141,19 +150,36 @@ module.exports = function(app) {
           var prefix = elementName(element) + '(' + element.type.value + ') tank ';
           reply += prefix + elementToString(element.currentLevel) + ', ' + elementToString(element.currentVolume) + '\n';
         });
+        Object.values(app.getSelfPath('tanks.wasteWater')).forEach(element => {
+          app.debug('Tank: ' + JSON.stringify(element));
+          var prefix = elementName(element) + '(' + element.type.value + ') tank ';
+          reply += prefix + elementToString(element.currentLevel) + ', ' + elementToString(element.currentVolume) + '\n';
+        });
       } else
       if (text == 'solar') {
         for (const [name, element] of Object.entries(app.getSelfPath('electrical.solar'))) {
-        //Object.values(app.getSelfPath('electrical.solar')).forEach(element => {
-          app.debug('Solar: ' + JSON.stringify(element));
-          reply += name + ': ' + elementToString(element.current) + ', power: ' + element.panelPower.value + ' Watt, charging mode: ' + element.chargingMode.value + '\n';
+          app.debug('Name: ' + name + ' element: ' + JSON.stringify(element));
+          reply += name + ': ' + elementToString(element.current) + ', power: ' + elementToString(element.panelPower, 'watt') + ', charging mode: ' + element.chargingMode.value + '\n';
         }
       } else
       if (text == 'wind') {
-          var windDirection = app.getSelfPath('environment.wind.directionGround')
+          var windDirection
+          var windType
+          try {
+            windDirection = app.getSelfPath('environment.wind.directionTrue')
+            windType = 'direction True ground'
+          }
+          catch (e) {
+            windDirection = app.getSelfPath('environment.wind.angleTrueWater')
+            windType = 'angle True water'
+          }
+          finally {
+            app.debug("Can't get wind angle")
+          }
+          
           windDirection['meta']['units'] = 'rad'
           var windSpeed = app.getSelfPath('environment.wind.speedOverGround')
-          reply += 'Wind over ground: ' + elementToString(windDirection) + ', ' + elementToString(windSpeed) + '\n';
+          reply += 'Wind ' + windType + ': ' + elementToString(windDirection) + ', ' + elementToString(windSpeed) + '\n';
       } else
       if (text == 'depth') {
           reply += 'Depth: ' + elementToString(app.getSelfPath('environment.depth.belowTransducer')) + '\n';
@@ -267,7 +293,7 @@ module.exports = function(app) {
 
   plugin.stop = function() {
     // Here we put logic we need when the plugin stops
-    //bot.close();
+    // bot.close();
     app.debug('Plugin stopped');
     unsubscribes.forEach(f => f());
     app.setPluginStatus('Stopped');
