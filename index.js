@@ -75,9 +75,19 @@ module.exports = function(app) {
           reply += 'Outside ' + elementToString(element);
         } catch (e) {}
         try {
-          element = app.getSelfPath('environment.inside.temperature');
+          element = app.getSelfPath('environment.inside.hutachterstuurboord.temperature');
           app.debug('Temp: ' + JSON.stringify(element));
-          reply += ', inside ' + elementToString(element);
+          reply += ', hut acher sb ' + elementToString(element);
+        } catch (e) {}
+        try {
+          element = app.getSelfPath('environment.inside.hutachterbakboord.temperature');
+          app.debug('Temp: ' + JSON.stringify(element));
+          reply += ', hut achter bb ' + elementToString(element);
+        } catch (e) {}
+        try {
+          element = app.getSelfPath('environment.inside.hutvoor.temperature');
+          app.debug('Temp: ' + JSON.stringify(element));
+          reply += ', hut voor ' + elementToString(element);
         } catch (e) {}
         try {
           element = app.getSelfPath('environment.inside.fridge.temperature');
