@@ -142,8 +142,8 @@ module.exports = function(app) {
         Object.values(app.getSelfPath('electrical.batteries')).forEach(element => {
           app.debug('Batt: ' + JSON.stringify(element));
           var prefix = elementName(element) + 'battery ';
-          if (typeof element.stateOfCharge != 'undefined') {
-            reply += prefix + elementToString(element.stateOfCharge, 'stateOfCharge') + ', ' + elementToString(element.voltage) + '\n';
+          if (typeof element.capacity.stateOfCharge != 'undefined') {
+            reply += prefix + elementToString(element.capacity.stateOfCharge, 'stateOfCharge') + ', ' + elementToString(element.voltage) + '\n';
           } else {
             reply += prefix + elementToString(element.voltage) + '\n';
           }
