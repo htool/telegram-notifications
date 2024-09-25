@@ -138,6 +138,16 @@ module.exports = function(app) {
           reply += 'No buddies nearby\n';
         }
       } else
+      if (text == 'starlink') {
+        element = app.getSelfPath('electrical.switches.starlink.state');
+        app.debug('Starlink: ' + JSON.stringify(element));
+        onoff = elementToString(element)
+        reply += "Starlink power: " + onoff
+        if (onoff == "on") {
+          element = app.getSelfPath('network.providers.starlink.status');
+          app.debug('Starlink network status: ' + JSON.stringify(element));
+        } 
+      } else
       if (text == 'batt') {
         Object.values(app.getSelfPath('electrical.batteries')).forEach(element => {
           app.debug('Batt: ' + JSON.stringify(element));
@@ -202,11 +212,23 @@ module.exports = function(app) {
         Wind - Wind information\n \
         Humidity - Humidity information\n \
         Depth - Depth information\n \
-        Buddy - Nearby buddies';
+        Buddy - Nearby buddies\n \
+        Starlink - Starlink status';
       }
 
       sendMessage(reply, text);
       //type other code here
+    });
+    bot.on('polling_error', (error) => {
+      app.error('Polling error occurred:', error);
+      if(error.code === 'ETIMEDOUT') {
+        app.debug('Attempting to restart polling after timeout...');
+        setTimeout(() => {
+          bot.startPolling();
+        }, 5000); // Wait for 5 seconds before attempting to restart
+      } else {
+        // Handle other types of errors
+      }
     });
     app.setPluginStatus('Running');
   };
@@ -230,6 +252,9 @@ module.exports = function(app) {
       units = type
     }
     var value = object.value;
+    if (typeof type == 'undefined' && (value == 0 || value == 1)) {
+      units = 'bool'
+    }
     app.debug('units: ' + units + ' value: ' + value);
 
     switch (units) {
@@ -269,6 +294,13 @@ module.exports = function(app) {
     case 'chargingMode':
       return ('charging mode: ' + value);
       break
+    case 'bool':
+      if ( value == 1) {
+        return "on"
+      } else if ( value == 0) {
+        return "off"
+      }
+      break
     default:
       return (value);
     }
@@ -302,8 +334,16 @@ module.exports = function(app) {
   }
 
   plugin.stop = function() {
-    // Here we put logic we need when the plugin stops
-    // bot.close();
+    if (bot) {
+      bot.stopPolling()
+        .then(() => {
+          app.debug('Bot polling stopped');
+        })
+        .catch((err) => {
+          app.error('Error stopping bot polling: ' + err);
+        });
+    }
+    
     app.debug('Plugin stopped');
     unsubscribes.forEach(f => f());
     app.setPluginStatus('Stopped');
