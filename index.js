@@ -67,6 +67,7 @@ module.exports = function(app) {
       app.debug('Options: ' + JSON.stringify(options));
       var reply = '';
 
+      try {
       if (text == 'temp') {
         var element;
         try {
@@ -149,15 +150,33 @@ module.exports = function(app) {
         } 
       } else
       if (text == 'batt') {
-        Object.values(app.getSelfPath('electrical.batteries')).forEach(element => {
-          app.debug('Batt: ' + JSON.stringify(element));
-          var prefix = elementName(element) + 'battery ';
-          if (typeof element.capacity.stateOfCharge != 'undefined') {
-            reply += prefix + elementToString(element.capacity.stateOfCharge, 'stateOfCharge') + ', ' + elementToString(element.voltage) + '\n';
-          } else {
-            reply += prefix + elementToString(element.voltage) + '\n';
+        const batteries = app.getSelfPath('electrical.batteries') || {};
+        for (const [id, element] of Object.entries(batteries)) {
+          try {
+            if (
+              !element ||
+              typeof element !== 'object' ||
+              !element.voltage ||
+              typeof element.name == 'undefined'
+            ) {
+              continue;
+            }
+            app.debug('Batt: ' + JSON.stringify(element));
+            var prefix = elementName(element) + 'battery ';
+            const soc = element.capacity && element.capacity.stateOfCharge;
+            if (typeof soc != 'undefined') {
+              reply += prefix + elementToString(soc, 'stateOfCharge') + ', ' + elementToString(element.voltage);
+            } else {
+              reply += prefix + elementToString(element.voltage);
+            }
+            if (element.current) {
+              reply += ', ' + elementToString(element.current);
+            }
+            reply += '\n';
+          } catch (e) {
+            app.debug('Batt error ' + id + ': ' + e);
           }
-        });
+        }
       } else
       if (text == 'tank') {
         Object.values(app.getSelfPath('tanks.freshWater')).forEach(element => {
@@ -177,9 +196,34 @@ module.exports = function(app) {
         });
       } else
       if (text == 'solar') {
-        for (const [name, element] of Object.entries(app.getSelfPath('electrical.solar'))) {
-          app.debug('Name: ' + name + ' element: ' + JSON.stringify(element));
-          reply += name + ': ' + elementToString(element.current) + ', power: ' + elementToString(element.panelPower, 'watt') + ', charging mode: ' + element.chargingMode.value + '\n';
+        const solar = app.getSelfPath('electrical.solar') || {};
+        for (const [name, element] of Object.entries(solar)) {
+          try {
+            if (!element || typeof element !== 'object') {
+              continue;
+            }
+            app.debug('Name: ' + name + ' element: ' + JSON.stringify(element));
+            const parts = [];
+            if (element.current) {
+              parts.push(elementToString(element.current));
+            }
+            if (element.panelPower) {
+              parts.push('power: ' + elementToString(element.panelPower, 'watt'));
+            }
+            if (element.panelVoltage) {
+              parts.push(elementToString(element.panelVoltage));
+            }
+            const mode = element.chargingMode || element.trackerOperationMode;
+            if (mode && typeof mode.value != 'undefined') {
+              parts.push('charging mode: ' + mode.value);
+            }
+            if (element.yieldToday && typeof element.yieldToday.value == 'number') {
+              parts.push('today: ' + (element.yieldToday.value / 3600).toFixed(0) + ' Wh');
+            }
+            reply += name + ': ' + parts.join(', ') + '\n';
+          } catch (e) {
+            app.debug('Solar error ' + name + ': ' + e);
+          }
         }
       } else
       if (text == 'wind') {
@@ -215,6 +259,12 @@ module.exports = function(app) {
         Buddy - Nearby buddies\n \
         Starlink - Starlink status';
       }
+      } catch (e) {
+        app.error('Telegram command failed: ' + e);
+        if (reply == '') {
+          reply = 'Error handling ' + text;
+        }
+      }
 
       sendMessage(reply, text);
       //type other code here
@@ -246,13 +296,16 @@ module.exports = function(app) {
   }
 
   function elementToString (object, type) {
+    if (!object || typeof object.value == 'undefined') {
+      return '';
+    }
     app.debug('type: ' + type + ' object: ' + JSON.stringify(object));
-    var units = object.meta.units;
-    if (typeof type != 'undefined') {
-      units = type
+    var units = type;
+    if (typeof units == 'undefined' && object.meta && object.meta.units) {
+      units = object.meta.units;
     }
     var value = object.value;
-    if (typeof type == 'undefined' && (value == 0 || value == 1)) {
+    if (typeof units == 'undefined' && (value == 0 || value == 1)) {
       units = 'bool'
     }
     app.debug('units: ' + units + ' value: ' + value);
@@ -271,7 +324,7 @@ module.exports = function(app) {
         return((value).toFixed(1) + 'm')
         break
       case 'stateOfCharge':
-        return ((value * 100) + '%');
+        return ((value * 100).toFixed(0) + '%');
         break
      case 'ratio':
       return ((value * 100).toFixed(1) + '%');
@@ -283,12 +336,13 @@ module.exports = function(app) {
       return (value.toFixed(1) + 'v');
       break
     case 'A':
-      return (value + 'A');
+      return (Number(value).toFixed(1) + 'A');
       break
     case 'm3':
       return ('liter: ' + (value  * 1000).toFixed(0));
       break
     case 'watt':
+    case 'W':
       return (value + ' Watt');
       break
     case 'chargingMode':
